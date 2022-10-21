@@ -1,0 +1,140 @@
+Sub imageReport()
+'' Howdy!
+'' This script, let's you know if a file is in a folder
+    
+    ' Initialize variables
+    Dim wb As Workbook
+    Dim s1, s2 As Worksheet
+    Dim total_rows_s1, total_rows_s2, companyVal, output_val As Integer
+    Dim sku_cell As Range
+    Dim folder_location, file_location, brand, company, destination_folder, picture_folder, brand_cell, brand_range As String
+
+    ' Set workbooks and range
+    Set wb = ActiveWorkbook
+    Set s1 = wb.Worksheets(1)
+    Set s2 = wb.Worksheets(2)
+    Set s3 = wb.Worksheets(3)
+    total_rows_s1 = s1.UsedRange.Rows.Count
+    total_rows_s2 = s2.UsedRange.Rows.Count
+    
+    output_val = 3
+    result_col = 3
+    
+    
+    For companyVal = 1 To 4
+            
+        If companyVal = 1 Then
+        brand_range = "D2:E272"
+        
+        ElseIf companyVal = 2 Then
+            brand_range = "L2: M45"
+            
+        ElseIf companyVal = 3 Then
+            brand_range = "H2: I70"
+            
+        ElseIf companyVal = 4 Then
+            brand_range = "T2: V350"
+            
+        End If
+        
+    
+            '' Loop through each file in a folder
+            For Each sku_cell In s1.Range("A2:A" & total_rows_s1)
+            
+
+            
+                '' get brand value
+                brand_to_find = s1.Cells(sku_cell.Row, 2).Value
+                
+                If companyVal = 1 Then
+                    result_col = output_val
+                
+                ElseIf companyVal = 2 Then
+                    result_col = output_val + 1
+                    
+                ElseIf companyVal = 3 Then
+                    result_col = output_val + 2
+                    
+                ElseIf companyVal = 4 Then
+                    result_col = output_val + 3
+                    
+                End If
+                
+                
+                
+                
+                
+                '' checks for #N/A
+                If sku_cell = "" Then
+                    s1.Cells(sku_cell.Row, result_col).Value = "SKU is empty"
+                    GoTo NextIteration
+                End If
+                
+                
+                
+                '' checks to see if the brand folder exists against "table" sheet
+                If IsError(Application.VLookup(brand_to_find, s3.Range(brand_range), 1, False)) Then
+                    
+                    s1.Cells(sku_cell.Row, result_col).Value = "Folder not found"
+                    
+                GoTo NextIteration
+                End If
+                
+                
+                brand_folder_path = Application.VLookup(brand_to_find, s3.Range(brand_range), 2, False) & "\"
+                
+                
+                If IsError(full_path_box = Dir(brand_folder_path & "UPLOADED\" & sku_cell.Value & "*-4.jpg")) Then
+                    
+                    s1.Cells(sku_cell.Row, result_col).Value = ""
+                    '' s1.Cells(sku_cell.Row, result_col).Value = "SKU needs imgs"
+                GoTo NextIteration
+                End If
+                
+                
+                full_path_box = Dir(brand_folder_path & "UPLOADED\" & sku_cell.Value & "*-4.jpg")
+                
+                '' full_path_box = Dir(brand_folder_path & "UPLOADED\" & sku_cell.Value & "*-1.jpg")
+                '' full_path_uploaded = Dir(brand_folder_path & "UPLOADED\" & sku_cell.Value & "*.jpg")
+                
+                
+                ''''''''''''''
+                
+                If full_path_box <> vbNullString Or full_path_uploaded <> vbNullString Then
+                    s1.Cells(sku_cell.Row, result_col).Value = "Exists in backup"
+                Else
+                    s1.Cells(sku_cell.Row, result_col).Value = ""
+                    '' s1.Cells(sku_cell.Row, result_col).Value = "SKU needs imgs"
+                End If
+                
+                
+                If companyVal = 4 Then
+                    full_path_box = Dir(brand_folder_path & "UPLOADED\" & sku_cell.Value & "*-1.jpg")
+                    
+                    If full_path_box <> vbNullString Or full_path_uploaded <> vbNullString Then
+                        s1.Cells(sku_cell.Row, result_col).Value = "Exists in backup"
+                    Else
+                        s1.Cells(sku_cell.Row, result_col).Value = ""
+                        '' s1.Cells(sku_cell.Row, result_col).Value = "SKU needs imgs"
+                    End If
+                    
+                End If
+                
+                        
+NextIteration:
+
+            Next sku_cell
+        
+
+        Next companyVal
+
+        
+        
+        
+    MsgBox "All set cowboy! ~.*" & vbCrLf & "Remember to thank your developer!"
+
+End Sub
+
+
+
+
